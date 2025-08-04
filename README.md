@@ -1,62 +1,226 @@
-# TLDR
+# Vector Search Reranking in 10 Minutes
 
-Welcome to Vector Search Reranking in 10 minutes
+A complete RAG (Retrieval-Augmented Generation) pipeline with advanced reranking capabilities for processing markdown files, generating embeddings, and performing intelligent similarity search with semantic reranking.
 
-## High level steps
+## Quick Start (TLDR)
 
-- Create a DB index
-- Seed the Vector DB
-- Perform similarity search
-- Rerank initial results
-- Take a subset of your reranked results
-- RAG
+**High-level workflow:**
+1. Create a Pinecone index
+2. Process and chunk markdown files
+3. Generate embeddings and seed the vector database
+4. Perform similarity search
+5. **Rerank results for better relevance** 🎯
+6. Use reranked results for RAG applications
 
-## Link to Pinecone
-
-https://pinecone.io/
-
-## Scripts Directory
-
-This directory contains modular Python scripts for processing markdown files with front matter and chunking content for embedding workflows.
-
-## Core Module
-
-### `markdown_processor.py`
-**Reusable module** containing all the core functionality for processing markdown files. This module can be imported by any script in the project.
-
-**Key Functions:**
-- `extract_front_matter_and_content()` - Extract YAML front matter from markdown
-- `setup_text_splitter()` - Configure LangChain TokenTextSplitter 
-- `process_markdown_file()` - Process a single markdown file
-- `process_multiple_markdown_files()` - Batch process files in a directory
-- `get_processing_stats()` - Calculate processing statistics
-- `save_processed_data_to_json()` - Save results to JSON file
-
-## Scripts
-
-### `process_markdown_files.py`
-**Main processing script** that uses the modular functions to process all markdown files in the `raw_data` folder. Optimized for Ada 002 embedding workflow.
-
-Usage:
+**Quick demo:**
 ```bash
-python scripts/process_markdown_files.py
+# Set up environment
+cp .env.example .env  # Add your API keys
+
+# Test with small sample
+python scripts/test_small_insert.py
+
+# Search with reranking (best results)
+python scripts/search_with_reranking.py "machine learning"
 ```
 
-### `example_usage.py`
-**Documentation script** showing various ways to use the modular functions in other scripts.
+## What This Project Does
 
-Usage:
+This project provides a **production-ready RAG pipeline** that:
+
+- 📄 **Processes markdown files** with YAML front matter extraction
+- 🔢 **Chunks content** using LangChain's TokenTextSplitter (optimized for Ada 002)
+- 🎯 **Generates embeddings** using OpenAI's `text-embedding-ada-002` model
+- 📚 **Stores vectors** in Pinecone with rich metadata
+- 🔍 **Performs similarity search** with multiple approaches
+- 🏆 **Reranks results** using state-of-the-art models for better relevance
+- ⚖️ **Compares search methods** side-by-side
+
+## Key Features
+
+### 🎯 **Multiple Search Approaches**
+- **Basic Similarity**: Fast embedding-based search
+- **Direct Cohere Reranking** 🏆: Advanced semantic reranking (recommended)
+- **Pinecone Hosted Reranking**: Integrated reranking (requires paid plan)
+- **Side-by-side Comparison**: See the difference reranking makes
+
+### 🛠️ **Production Ready**
+- Modular, reusable functions
+- Comprehensive error handling
+- Rate limiting and batch processing
+- Interactive and scriptable modes
+- Rich metadata preservation
+
+## Installation & Setup
+
+### 1. Install Dependencies
+
 ```bash
-python scripts/example_usage.py
+# Using uv (recommended)
+uv sync
+
+# Or using pip
+pip install -e .
 ```
 
-## Usage Examples
+### 2. Environment Configuration
 
-### Import the module in your own scripts:
+Create a `.env` file in the project root:
+
+```bash
+cat > .env << EOF
+# Pinecone Configuration
+PINECONE_API_KEY=your-pinecone-api-key-here
+PINECONE_INDEX_NAME=your-index-name
+
+# OpenAI Configuration  
+OPENAI_API_KEY=your-openai-api-key-here
+
+# Cohere Configuration (for reranking - recommended)
+COHERE_API_KEY=your-cohere-api-key-here
+EOF
+```
+
+**Required APIs:**
+- **Pinecone**: [pinecone.io](https://pinecone.io) - Vector database
+- **OpenAI**: [platform.openai.com](https://platform.openai.com) - Embeddings
+- **Cohere**: [cohere.ai](https://cohere.ai) - Reranking (free tier available)
+
+## Complete Workflow
+
+### Step-by-Step Pipeline
+
+```bash
+# 1. Test with small sample first (recommended)
+python scripts/test_small_insert.py
+
+# 2. (Optional) Clear existing data
+python scripts/delete_pinecone_index.py
+
+# 3. Process ALL files and insert into Pinecone
+python scripts/insert_into_pinecone.py
+
+# 4. Search with reranking (best results) 🏆
+python scripts/search_with_reranking.py "your search query"
+
+# 5. (Optional) Compare search methods
+python scripts/compare_search_methods.py "your search query"
+```
+
+### Alternative Search Options
+
+```bash
+# Basic similarity search (fastest)
+python scripts/search_pinecone.py "vector database"
+
+# Advanced reranking search (best relevance) 🏆
+python scripts/search_with_reranking.py "vector database" --initial-top-k 15 --rerank-top-k 5
+
+# Pinecone hosted reranking (requires paid plan)
+python scripts/search_with_pinecone_reranking.py "vector database"
+
+# Compare methods side-by-side
+python scripts/compare_search_methods.py "vector database"
+
+# Interactive search mode
+python scripts/search_with_reranking.py --interactive
+```
+
+## Scripts Overview
+
+### **Core Module**
+- **`scripts/markdown_processor.py`** → Reusable module with all processing functions
+
+### **Data Management**
+- **`scripts/test_small_insert.py`** → Test pipeline with 3 smallest files ⭐ (start here)
+- **`scripts/insert_into_pinecone.py`** → Full pipeline: process → embed → insert
+- **`scripts/delete_pinecone_index.py`** → Clear all vectors from index
+- **`scripts/process_markdown_files.py`** → Process files locally (no Pinecone)
+
+### **Search & Reranking**
+- **`scripts/search_with_reranking.py`** → **🏆 Advanced Cohere reranking (recommended)**
+- **`scripts/search_pinecone.py`** → Basic similarity search
+- **`scripts/search_with_pinecone_reranking.py`** → Pinecone hosted reranking
+- **`scripts/compare_search_methods.py`** → Side-by-side comparison tool
+
+### **Examples & Documentation**
+- **`scripts/example_usage.py`** → Code examples for using the module
+
+## Search Examples
+
+### Basic Search
+```bash
+# Simple search
+python scripts/search_pinecone.py "machine learning"
+
+# More results with full text
+python scripts/search_pinecone.py "docker deployment" --top-k 10 --full-text
+```
+
+### Advanced Reranking (Recommended) 🏆
+```bash
+# Basic reranking - significantly better results
+python scripts/search_with_reranking.py "machine learning"
+
+# Custom parameters for fine-tuning
+python scripts/search_with_reranking.py \
+  --query "docker kubernetes deployment" \
+  --initial-top-k 20 \
+  --rerank-top-k 5
+
+# Interactive mode for experimentation
+python scripts/search_with_reranking.py --interactive
+```
+
+### Compare Search Methods
+```bash
+# See the difference reranking makes
+python scripts/compare_search_methods.py "vector database"
+```
+
+## Why Reranking?
+
+**Traditional similarity search** uses embedding cosine similarity, which sometimes misses nuanced semantic relationships.
+
+**Reranking** uses advanced language models to understand true semantic relevance:
+
+1. **Cast a wide net**: Fetch 15-20 candidates with similarity search
+2. **Intelligent ranking**: Use Cohere's reranking model to understand semantic relevance  
+3. **Better results**: Return the most actually relevant content
+
+**Results:**
+- 🎯 **Higher precision** - More relevant results
+- 🧠 **Better semantics** - Understands context and intent
+- 📊 **Dual scoring** - Shows both similarity and relevance scores
+
+## API Key Setup
+
+### Cohere (Recommended for Reranking)
+
+1. Visit [cohere.ai](https://cohere.ai) and create a free account
+2. Go to your dashboard and generate an API key
+3. Add `COHERE_API_KEY=your-key-here` to your `.env` file
+
+**Why Cohere?**
+- ✅ Free tier available for testing
+- ✅ State-of-the-art reranking models
+- ✅ Works with any Pinecone plan
+- ✅ Transparent pricing
+
+### Pinecone vs. Direct Cohere
+
+| Approach | Setup | Cost | Performance | Recommendation |
+|----------|-------|------|-------------|----------------|
+| **Direct Cohere** | Separate API key | Pay per use | Latest models | **🏆 Recommended** |
+| **Pinecone Hosted** | Single API key | Included in plan | Integrated | Requires paid plan |
+
+## Programming Examples
+
+### Using the Core Module
 
 ```python
 from pathlib import Path
-from markdown_processor import (
+from scripts.markdown_processor import (
     setup_text_splitter,
     process_markdown_file,
     process_multiple_markdown_files
@@ -67,149 +231,103 @@ splitter = setup_text_splitter(chunk_size=1000, encoding_name="cl100k_base")
 result = process_markdown_file(Path("example.md"), splitter)
 
 # Batch process files
-results = process_multiple_markdown_files(Path("./data"))
+results = process_multiple_markdown_files(Path("./raw_data"))
 
-# Extract just front matter
-from markdown_processor import extract_front_matter_and_content
+# Extract front matter
+from scripts.markdown_processor import extract_front_matter_and_content
 with open("file.md") as f:
     front_matter, content = extract_front_matter_and_content(f.read())
 ```
 
-### Different tokenizer encodings for various models:
+### Tokenizer Options
 
-- **Ada 002, GPT-3.5, GPT-4**: `"cl100k_base"`
+Choose the right encoding for your embedding model:
+
+- **Ada 002, GPT-3.5, GPT-4**: `"cl100k_base"` (default)
 - **Older GPT models**: `"gpt2"`
 - **Codex models**: `"p50k_base"`
 
-### `delete_pinecone_index.py`
-**Pinecone management script** that connects to your Pinecone index and deletes all vectors, effectively clearing the index.
-
-Usage:
-```bash
-python scripts/delete_pinecone_index.py
-```
-
-### `insert_into_pinecone.py`
-**Complete pipeline script** that:
-1. Processes all markdown files using the modular functions
-2. Generates embeddings using OpenAI's Ada 002 model  
-3. Inserts embedded chunks into Pinecone with rich metadata
-
-Usage:
-```bash
-python scripts/insert_into_pinecone.py
-```
-
-### `test_small_insert.py`
-**Test script** that processes only the 3 smallest files to test the pipeline without hitting API quota limits.
-
-Usage:
-```bash
-python scripts/test_small_insert.py
-```
-
-### `search_pinecone.py`
-**Similarity search script** that allows you to query your Pinecone index to find the most similar content chunks.
-
-Usage:
-```bash
-# Basic search
-python scripts/search_pinecone.py "machine learning"
-
-# Advanced search with options
-python scripts/search_pinecone.py --query "docker deployment" --top-k 3 --full-text
-
-# Interactive mode
-python scripts/search_pinecone.py --interactive
-```
-
-## Environment Setup
-
-Create a `.env` file in the project root with your API keys:
-
-```bash
-# Create .env file in project root
-cat > .env << EOF
-# Pinecone Configuration
-PINECONE_API_KEY=your-pinecone-api-key-here
-PINECONE_INDEX_NAME=your-index-name
-
-# OpenAI Configuration  
-OPENAI_API_KEY=your-openai-api-key-here
-EOF
-
-# Then edit with your actual API keys
-```
-
-**Required Environment Variables:**
-- `PINECONE_API_KEY` - Your Pinecone API key
-- `PINECONE_INDEX_NAME` - Name of your Pinecone index  
-- `OPENAI_API_KEY` - Your OpenAI API key for Ada 002 embeddings
-
-## Search Examples
-
-Once you have data in your Pinecone index, you can search it in multiple ways:
-
-```bash
-# Basic search for machine learning content
-python scripts/search_pinecone.py "machine learning"
-
-# Search for Docker-related content with more results
-python scripts/search_pinecone.py --query "docker deployment" --top-k 10
-
-# Show full text instead of previews
-python scripts/search_pinecone.py "OpenAI API" --full-text
-
-# Interactive mode for multiple searches
-python scripts/search_pinecone.py --interactive
-
-# Search for specific technologies
-python scripts/search_pinecone.py "vector database"
-python scripts/search_pinecone.py "Flask Python"
-python scripts/search_pinecone.py "React TypeScript"
-```
-
-## Complete Workflow
-
-Here's the typical workflow for processing markdown files and inserting into Pinecone:
-
-```bash
-# 1. Set up environment variables
-cat > .env << EOF
-PINECONE_API_KEY=your-actual-api-key
-PINECONE_INDEX_NAME=reranking-vectors
-OPENAI_API_KEY=your-actual-openai-key
-EOF
-
-# 2. (Recommended) Test with small sample first
-python scripts/test_small_insert.py
-
-# 3. (Optional) Clear existing data from Pinecone index
-python scripts/delete_pinecone_index.py
-
-# 4. Process ALL markdown files and insert into Pinecone with embeddings
-python scripts/insert_into_pinecone.py
-
-# 5. Search your index for similar content
-python scripts/search_pinecone.py "your search query"
-
-# 6. (Optional) Process files standalone for analysis
-python scripts/process_markdown_files.py
-```
-
-**What each script does:**
-- **`test_small_insert.py`** → Test pipeline with 3 smallest files (recommended first)
-- **`delete_pinecone_index.py`** → Clears all vectors from your index
-- **`insert_into_pinecone.py`** → Full pipeline: chunk → embed → insert (all files)
-- **`search_pinecone.py`** → Query your index to find similar content chunks
-- **`process_markdown_files.py`** → Process and analyze files locally
-
 ## Dependencies
 
-Required packages (already in `pyproject.toml`):
-- `langchain-text-splitters>=0.3.0`
-- `pyyaml>=6.0`
-- `tiktoken>=0.5.0`
-- `pinecone>=3.0.0`
-- `openai>=1.0.0`
-- `python-dotenv>=1.0.0`
+All dependencies are managed in `pyproject.toml`:
+
+```toml
+dependencies = [
+    "langchain-text-splitters>=0.3.0",
+    "pyyaml>=6.0",
+    "tiktoken>=0.5.0",
+    "pinecone>=3.0.0",
+    "openai>=1.0.0",
+    "python-dotenv>=1.0.0",
+    "cohere>=5.0.0",
+]
+```
+
+## Data Structure
+
+The pipeline processes markdown files from `raw_data/` with the following structure:
+
+```
+raw_data/
+├── video1.md    # YAML front matter + content
+├── video2.md    # Automatically chunked
+└── ...
+```
+
+Each file includes rich metadata:
+- Video title and URL
+- File information
+- Chunk indices and content
+- Processing timestamps
+
+## Troubleshooting
+
+### Common Issues
+
+**"Permission denied" for Pinecone reranking:**
+```bash
+# Use direct Cohere instead
+python scripts/search_with_reranking.py "your query"
+```
+
+**OpenAI quota exceeded:**
+```bash
+# Test with smaller sample first
+python scripts/test_small_insert.py
+```
+
+**Import errors:**
+```bash
+# Install in development mode
+pip install -e .
+```
+
+## Project Structure
+
+```
+reranking/
+├── README.md                      # This file
+├── pyproject.toml                 # Dependencies
+├── .env                          # API keys (create this)
+├── raw_data/                     # Source markdown files
+├── scripts/
+│   ├── markdown_processor.py     # Core module
+│   ├── test_small_insert.py      # ⭐ Start here
+│   ├── insert_into_pinecone.py   # Full pipeline
+│   ├── search_with_reranking.py  # 🏆 Best search
+│   ├── search_pinecone.py        # Basic search
+│   ├── compare_search_methods.py # Comparison tool
+│   └── ...                       # Other utilities
+└── READMEs/                      # Additional documentation
+```
+
+## What's Next?
+
+1. **🚀 Start here**: `python scripts/test_small_insert.py`
+2. **🔍 Search**: `python scripts/search_with_reranking.py "your query"`
+3. **📊 Compare**: `python scripts/compare_search_methods.py "your query"`
+4. **🛠️ Customize**: Modify chunk sizes, models, or add new functionality
+
+---
+
+**Ready to get started?** Run the test script and start searching! 🎯
